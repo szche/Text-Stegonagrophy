@@ -1,0 +1,22 @@
+
+
+.selectMode .col {
+    text-align: center;
+    border-radius: 5px;
+    background-color: rgb(231, 231, 231);
+    padding: 20px;
+    margin: 10px;
+}
+
+.selectMode .col .lead {
+    font-size: 0.9em;
+}
+
+.selectMode .col span {
+    font-size: 8em;
+}
+
+.stegoChoice:hover {
+    cursor: pointer;
+    background-color: rgb(220, 220, 220);
+}
