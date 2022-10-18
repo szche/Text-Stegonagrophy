@@ -1,0 +1,64 @@
+.header span {
+    font-size: 8em;
+}
+
+.header .lead {
+    font-size: 0.9em;
+}
+
+.goHome {
+    padding: 10px;
+    text-align: right;
+}
+.goHome span {
+    font-size: 2em;
+    float: right;
+}
+
+.goHome span:hover {
+    font-size: 2.1em;
+    cursor: pointer;
+}
+
+.goHome a {
+    text-decoration: none;
+    color: black;
+}
+
+
+#result {
+    text-align: justify;
+    text-justify: inter-word;
+    font-size: 0.7em;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: white;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    border: 10px solid rgb(231, 231, 231);
+
+}
+
+.encode-decode-rows .col .mt-5 {
+    text-align: center;
+    padding: 30px;
+    border-radius: 5px;
+    background-color: rgb(231, 231, 231);
+    height: 400px;
+}
+
+.encode-decode-rows .col .mt-5 button {
+    margin-top: 20px;
+    font-size: 1.3em;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+#result-div {
+    text-align: center;
+    margin: 0px;
+    margin-top: 20px;
+    margin-bottom: 50px;
+    display: none;
+}
