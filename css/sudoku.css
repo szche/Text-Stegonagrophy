@@ -5,22 +5,40 @@ table {
 td {
     height: 30px;
     width: 30px;
-    border: 1px solid;
+    border: 1px solid black;
     text-align: center;
 }
 
 td:first-child {
-    border-left: solid;
+    border-left: solid black;
 }
 
 td:nth-child(3n) {
-    border-right: solid;
+    border-right: solid black;
 }
 
 tr:first-child {
-    border-top: solid;
+    border-top: solid black;
 }
 
 tr:nth-child(3n) td {
-    border-bottom: solid;
+    border-bottom: solid black;
+}
+
+p {
+    font-size: 24px;
+    color: rgb(143, 39, 35);
+}
+
+#result {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    row-gap: 15px;
+    column-gap: 15px;
+}
+
+button {
+    margin-top: 10px;
+    min-width: 150px;
 }

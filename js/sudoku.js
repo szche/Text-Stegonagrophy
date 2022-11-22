@@ -1,7 +1,23 @@
+const NUMBER_OF_COLORS = 1;
+const NUMBERS_IN_SUDOKU = 20;
+const colors = [
+  "black",
+  "#7D65EC",
+  "#6DBD40",
+  "#718F60",
+  "#EBE95D",
+  "#FF7514",
+  "#633A34",
+  "#2F4538",
+  "#FF2301",
+  "#D6AE01",
+];
+let sudokuArr = null;
+
 const textToAscii = (text) => {
   let arr = [];
   for (let i = 0; i < text.length; i++) {
-    arr.push(text.charCodeAt(i));
+    arr.push(text.toLowerCase().charCodeAt(i));
   }
   return arr;
 };
@@ -38,13 +54,57 @@ const createCoverTextMatrix = (coverText) => {
       if (j == 9) break;
       const asciiArray = [];
       for (let z = 0; z < words[j].length; z++) {
-        if (z == 9) break;
+        if (z == 8) break;
+        words[j] = words[j].toLowerCase();
         asciiArray.push(words[j].charCodeAt(z));
       }
+      if (j < words.length - 1) {
+        asciiArray.push(" ".charCodeAt(0));
+      } else {
+        asciiArray.push(".".charCodeAt(0));
+      }
+      asciiArray.push;
       matrix[k][j] = asciiArray;
     }
   }
   return arrOfMatrix;
+};
+
+const generateRandomIntegerInRange = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const fillWithRandomNumbers = (
+  collisionRows,
+  collisionColumns,
+  sudoku,
+  numbers,
+  tryCount
+) => {
+  console.log(numbers);
+  for (let z = 0; z < tryCount; z++) {
+    if (numbers > NUMBERS_IN_SUDOKU) {
+      break;
+    }
+    const randomColumn = generateRandomIntegerInRange(0, 8);
+    const randomRow = generateRandomIntegerInRange(0, 8);
+    // console.log(collisionColumns, collisionRows);
+    const randomNumber = generateRandomIntegerInRange(1, 9);
+    if (
+      !collisionRows[randomRow].includes(randomNumber) &&
+      !collisionColumns[randomColumn].includes(randomNumber) &&
+      sudoku[randomRow][randomColumn] == null
+    ) {
+      sudoku[randomRow][randomColumn] = {
+        number: randomNumber,
+        color: "#f59842",
+      };
+      collisionColumns[randomColumn].push(randomNumber);
+      collisionRows[randomRow].push(randomNumber);
+      numbers++;
+    }
+  }
+  // return sudoku;
 };
 
 const createSudoku = (coverTextMatrix, secretTextAscii) => {
@@ -75,91 +135,235 @@ const createSudoku = (coverTextMatrix, secretTextAscii) => {
   let columnsArr = []; //word number
   let number = []; //letter number
   let letterCount = 0;
-  coverTextMatrix: for (let k = 0; k < coverTextMatrix.length; k++) {
-    const sudoku = Array.from(Array(9), () => new Array(9));
-    sudokuArray.push(sudoku);
-    firstMatrixLoop: for (let i = 0; i < coverTextMatrix[k].length; i++) {
-      secondMatrixLoop: for (let j = 0; j < coverTextMatrix[k][i].length; j++) {
-        if (!coverTextMatrix[k][i][j]) continue firstMatrixLoop;
-        letterLoop: for (let z = 0; z < coverTextMatrix[k][i][j].length; z++) {
-          if (asciiArray[letterCount] == coverTextMatrix[k][i][j][z]) {
-            let row = 3 * Math.floor(i / 3) + Math.floor(j / 3);
-            let column = 3 * (i % 3) + (j % 3);
-            console.log(i, j);
-            console.log(row, column);
-            if (
-              collisionRows[row].includes(z) ||
-              collisionColumns[column].includes(z) ||
-              sudoku[row][column] != null
-            ) {
-              continue letterLoop;
+  //Loop over arr of coverMatrix
+  //Loop over rows and columns of coverMatrix
+  //searching for letter
+
+  let loopOverColor = -1;
+  let loopOverText = 0;
+  let loopOverSudokuArr = 0;
+  let numbersInSudoku = 0;
+  let lastSudoku = false;
+  const sudoku = Array.from(Array(9), () => new Array(9));
+  sudokuArray.push(sudoku);
+  // console.log(coverTextMatrix);
+  // console.log(secretTextAscii);
+  //arr of coverTextMatrix
+  coverTextMatrix.forEach((arrayCovText) => {
+    //Reset color if color = green
+    loopOverColor++;
+    // console.log(loopOverText, secretTextAscii.length);
+    if (loopOverText < secretTextAscii.length) {
+      if (loopOverColor == NUMBER_OF_COLORS) {
+        console.log("DUPA");
+        fillWithRandomNumbers(
+          collisionRows,
+          collisionColumns,
+          sudokuArray[loopOverSudokuArr],
+          numbersInSudoku,
+          1000
+        );
+        loopOverColor = 0;
+        numbersInSudoku = 0;
+        const sudoku = Array.from(Array(9), () => new Array(9));
+        sudokuArray.push(sudoku);
+        collisionRows = {
+          0: [],
+          1: [],
+          2: [],
+          3: [],
+          4: [],
+          5: [],
+          6: [],
+          7: [],
+          8: [],
+        };
+        collisionColumns = {
+          0: [],
+          1: [],
+          2: [],
+          3: [],
+          4: [],
+          5: [],
+          6: [],
+          7: [],
+          8: [],
+        };
+        loopOverSudokuArr++;
+      }
+      // console.log(arrayCovText);
+      //Loop over columns
+      loopOverRows: for (let i = 0; i < arrayCovText.length; i++) {
+        loopOverColumns: for (let j = 0; j < arrayCovText[i].length; j++) {
+          if (!arrayCovText[i][j]) continue loopOverRows;
+          loopOverLetters: for (let k = 0; k < arrayCovText[i][j].length; k++) {
+            //Find number
+            if (secretTextAscii[loopOverText] == arrayCovText[i][j][k]) {
+              const foundNumber = k + 1;
+              let row = 3 * Math.floor(i / 3) + Math.floor(j / 3);
+              let column = 3 * (i % 3) + (j % 3);
+              if (
+                !collisionRows[row].includes(foundNumber) &&
+                !collisionColumns[column].includes(foundNumber) &&
+                sudokuArray[loopOverSudokuArr][row][column] == null
+              ) {
+                sudokuArray[loopOverSudokuArr][row][column] = {
+                  number: foundNumber,
+                  color: colors[loopOverColor],
+                };
+                collisionRows[row].push(foundNumber);
+                collisionColumns[column].push(foundNumber);
+                loopOverText++;
+                numbersInSudoku++;
+              }
             }
-            sudoku[row][column] = z;
-            collisionRows[row].push(z);
-            collisionColumns[column].push(z);
-            letterCount++;
           }
         }
       }
+    } else if (loopOverText == secretTextAscii.length) {
+      lastSudoku = true;
+      loopOverText++;
     }
-  }
-  if (letterCount != asciiArray.length) {
-    new Error("Cover text is too short!");
+
+    if (lastSudoku) {
+      lastSudoku = false;
+      // console.log(
+      //   collisionRows,
+      //   collisionColumns,
+      //   sudokuArray[loopOverSudokuArr],
+      //   numbersInSudoku,
+      //   loopOverSudokuArr
+      // );
+      fillWithRandomNumbers(
+        collisionRows,
+        collisionColumns,
+        sudokuArray[loopOverSudokuArr],
+        numbersInSudoku,
+        1000
+      );
+    }
+  });
+
+  if (loopOverText - 1 != secretTextAscii.length) {
+    throw new Error("Cover text is too short!");
   }
   return sudokuArray;
 };
-
-const revealText = (sudokuArr, coverTextMatrix) => {
-  let rowsArr = []; //sentence number
-  let columnsArr = []; //word number
-  let number = []; //letter number
-  for (let k = 0; k < coverTextMatrix.length; k++) {
-    console.log(coverTextMatrix[k])
-  }
-}
-
-const coverText =
-  "Having one’s own house is a great blessing of God. One feels good, safe and secure at his home. A house, you know is an important necessity. The quality of life improves when you have a comfortable house of your own. It gives you an opportunity to turn some of your dreams into reality. You decorate your room as per your taste. You look after your garden with trees of fruits. Having one’s own house is a great blessing of God. One feels good, safe and secure at his home. A house, you know is an important necessity. The quality of life improves when you have a comfortable house of your own. It gives you an opportunity to turn some of your dreams into reality. You decorate your room as per your taste. You look after your garden with trees of fruits. Having one’s own house is a great blessing of God. One feels good, safe and secure at his home. A house, you know is an important necessity. The quality of life improves when you have a comfortable house of your own. It gives you an opportunity to turn some of your dreams into reality. You decorate your room as per your taste. You look after your garden with trees of fruits";
-
-const secret = "test";
 
 $("#hide").click(function () {
   var secret = document.getElementById("secret-to-hide").value;
   var cover = document.getElementById("cover-text").value;
   const secretAsciiText = textToAscii(secret);
   const coverMatrix = createCoverTextMatrix(cover);
-  const sudokuArr = createSudoku(coverMatrix, secretAsciiText);
-  const arrOfTables = [];
-  console.log(sudokuArr);
-  let k = 0;
-  sudokuArr.forEach((matrix) => {
-    const table = document.createElement("table");
-    arrOfTables.push(table);
-    for (let i = 0; i < 9; i++) {
-      let row = table.insertRow();
-      for (let j = 0; j < 9; j++) {
-        let cell = row.insertCell();
-        console.log(matrix[i][j]);
-        if (!matrix[i][j]) {
-          cell.innerText = "";
-        } else {
-          cell.innerText = matrix[i][j];
+  document.getElementById("result").innerHTML = null;
+  try {
+    sudokuArr = createSudoku(coverMatrix, secretAsciiText);
+    const arrOfTables = [];
+
+    // console.log(sudokuArr);
+    let k = 0;
+    sudokuArr.forEach((matrix) => {
+      const table = document.createElement("table");
+      arrOfTables.push(table);
+      for (let i = 0; i < 9; i++) {
+        let row = table.insertRow();
+        for (let j = 0; j < 9; j++) {
+          let cell = row.insertCell();
+          if (!matrix[i][j]) {
+            cell.innerText = "";
+          } else {
+            cell.innerText = matrix[i][j].number;
+            cell.style.color = matrix[i][j].color;
+          }
+        }
+      }
+    });
+    arrOfTables.forEach((table) => {
+      document.getElementById("result").appendChild(table);
+    });
+    // revealText(sudokuArr, coverMatrix);
+    document.getElementById("copy").classList.remove("disabled");
+    $("#result-div").fadeIn();
+  } catch (err) {
+    const paragraph = document.createElement("p");
+    const newContent = document.createTextNode(err);
+    paragraph.appendChild(newContent);
+    document.getElementById("result").appendChild(paragraph);
+  }
+});
+
+function printArr(arr) {
+  let str = "";
+  for (let item of arr) {
+    if (Array.isArray(item)) str += printArr(item);
+    else str += item + ", ";
+  }
+  return str;
+}
+
+$("#copy").click(function () {
+  let copyTextarea = document.createElement("textarea");
+  document.body.appendChild(copyTextarea);
+  // console.log(sudokuArr);
+  copyTextarea.value = JSON.stringify(sudokuArr, null, 2);
+  copyTextarea.focus();
+  copyTextarea.select();
+
+  try {
+    let successful = document.execCommand("copy");
+    let msg = successful ? "successful" : "unsuccessful";
+    document.body.removeChild(copyTextarea);
+    // console.log("Copying text command was " + msg);
+  } catch (err) {
+    // console.log("Oops, unable to copy");
+  }
+});
+
+$("#reveal").click(function () {
+  let cover = document.getElementById("text-to-reveal").value;
+  let sudokuArray = JSON.parse(document.getElementById("sudoku-array").value);
+  const coverMatrix = createCoverTextMatrix(cover);
+  hidden_text = revealText(sudokuArray, coverMatrix);
+  document.getElementById("result").innerText = hidden_text;
+  $("#result-div").fadeIn();
+});
+
+const revealText = (sudokuArr, coverTextMatrix) => {
+  //Od Koloru zależy kolejność w coverTextMatrix
+
+  let sudokuLoopCount = 0;
+  let coverTextMatrixCount = -1;
+  console.log(coverTextMatrix);
+  let arrOfCubes = [];
+  let cubes = null;
+  sudokuArr.forEach((sudoku) => {
+    sudokuLoopCount++;
+    loopOverColors: for (let k = 0; k < NUMBER_OF_COLORS; k++) {
+      coverTextMatrixCount++;
+      cubes = Array.from(Array(9), () => new Array());
+      arrOfCubes.push(cubes);
+      loopOverRows: for (let i = 0; i < 9; i++) {
+        loopOverColumns: for (let j = 0; j < 9; j++) {
+          // console.log(coverTextMatrix[coverTextMatrixCount]);
+          if (sudoku[i][j]) {
+            if (sudoku[i][j].color == colors[k]) {
+              let cube = 3 * Math.floor(i / 3) + Math.floor(j / 3);
+              let order = (i % 3) * 3 + (j % 3);
+              let number = sudoku[i][j].number - 1;
+              console.log(coverTextMatrixCount, cube, order, number);
+              let letter = String.fromCharCode(
+                coverTextMatrix[coverTextMatrixCount][cube][order][number]
+              );
+              cubes[cube].push(letter);
+              console.log(letter);
+            }
+          }
         }
       }
     }
   });
-  arrOfTables.forEach((table) => {
-    document.getElementById("result").appendChild(table);
-  });
-  revealText(sudokuArr, coverMatrix)
-  $("#result-div").fadeIn();
-});
-
-
-
-// $("#reveal").click(function () {
-//   var text = document.getElementById("text-to-reveal").value;
-//   hidden_text = reveal(text, LINE_LENGHT);
-//   document.getElementById("result").innerText = hidden_text;
-//   $("#result-div").fadeIn();
-// });
+  console.log(arrOfCubes.flat(3));
+  let result = arrOfCubes.flat(3).join("");
+  console.log(result);
+  return result;
+};
